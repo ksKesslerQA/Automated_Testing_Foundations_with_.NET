@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace Car_Park
 {
@@ -17,13 +20,16 @@ namespace Car_Park
 
         static void Main(string[] args)
         {
+
+            //Заполнить единую коллекцию, содержащую объекты типа "Грузовик", "Легковой автомобиль", "Автобус", "Скутер" (из предыдущего задания по ООП) с различными значениями полей.
+
             var theEngines = new List<Engine>
         {
-            new Engine("Engine1") { power = 190, volume = 2000, type = "some type", serialNumber = "12345a"},
-            new Engine("Engine2") { power = 380, volume = 11000, type = "V6", serialNumber = "62542kp"},
-            new Engine("Engine3") { power = 190, volume = 2000, type = "some type", serialNumber = "12345a"},
-            new Engine("Engine4") { power = 190, volume = 2000, type = "some type", serialNumber = "12345a"},
-            new Engine("Engine5") { power = 190, volume = 2000, type = "some type", serialNumber = "12345a"}
+            new Engine("Engine1") { power = 190, volume = 1.1, type = "some type", serialNumber = "12345a"},
+            new Engine("Engine2") { power = 380, volume = 1.4, type = "V6", serialNumber = "62542kp"},
+            new Engine("Engine3") { power = 190, volume = 1.8, type = "some type", serialNumber = "12345a"},
+            new Engine("Engine4") { power = 190, volume = 2.9, type = "some type", serialNumber = "12345a"},
+            new Engine("Engine5") { power = 190, volume = 3.5, type = "some type", serialNumber = "12345a"}
         };
 
             var theChassis = new List<Chassis>
@@ -38,8 +44,8 @@ namespace Car_Park
             var theTransmissions = new List<Transmission>
         {
             new Transmission("Transmission1") { type = "Automatic", numberOfGears = 8, manufacturer = "Manufacturer1" },
-            new Transmission("Transmission2") { type = "Automatic", numberOfGears = 8, manufacturer = "Manufacturer1" },
-            new Transmission("Transmission3") { type = "Automatic", numberOfGears = 8, manufacturer = "Manufacturer1" },
+            new Transmission("Transmission2") { type = "Semiautomatic", numberOfGears = 8, manufacturer = "Manufacturer1" },
+            new Transmission("Transmission3") { type = "Manual", numberOfGears = 8, manufacturer = "Manufacturer1" },
             new Transmission("Transmission4") { type = "Automatic", numberOfGears = 8, manufacturer = "Manufacturer1" }
         };
 
@@ -58,12 +64,107 @@ namespace Car_Park
 
             };
 
+            /*
             foreach (var vehicle in vehicles)
             {
                 Vehicle.GetFullInfo(vehicle);
             }
+            
+            
+            var SelectedVehicles = from v in vehicles
+                                   where v.EngineVolume > 1.5
+                                   select v;
+         */
 
-                
+            //Task 3 
+            //Записать в соответствующие XML файлы следующую информацию:
+            //Полную информацию о всех транспортных средствах, обьем двигателя которых больше чем 1.5 литров;
+
+            var SelectedVehiclesToXML = new XElement ("Root",
+                from v in vehicles
+                where v.EngineVolume > 1.5
+                select new XElement("Vehicle",
+                           new XElement("Name", v.Name),
+                           new XElement("EngineName", v.EngineName),
+                           new XElement("EngineVolume", v.EngineVolume),
+                           new XElement("EnginePower", v.EnginePower),
+                           new XElement("EngineType", v.EngineType),
+                           new XElement("EngineSerialNumber", v.EngineSerialNumber),
+                           new XElement("ChassisName", v.ChassisName),
+                           new XElement("ChassisNumberOfWheels", v.ChassisNumberOfWheels),
+                           new XElement("ChassisPermissibleLoad", v.ChassisPermissibleLoad),
+                           new XElement("ChassisPermissibleLoad", v.ChassisLicensePlate),
+                           new XElement("TransmissionName", v.TransmissionName),
+                           new XElement("TransmissionName", v.TransmissionType),
+                           new XElement("TransmissionName", v.TransmissionNumberOfGears),
+                           new XElement("TransmissionName", v.TransmissionManufacturer)
+                        )
+                    );
+
+            SelectedVehiclesToXML.Save("SelectedVehicles.xml");
+
+
+            //Task 4
+            //Записать в соответствующие XML файлы следующую информацию:
+            //Тип двигателя, серийный номер и его мощность для всех автобусов и грузовиков; 
+
+            var SelectedBusAndTrackToXML = new XElement("Root",
+                from v in vehicles
+                where v.GetType().Name == "Bus" || v.GetType().Name == "Truck"
+                select new XElement("Vehicle",
+                           new XElement("Name", v.Name),
+                           new XElement("EngineType", v.EngineType),
+                           new XElement("EngineSerialNumber", v.EngineSerialNumber),
+                           new XElement("EnginePower", v.EnginePower)
+                        )
+                    );
+
+            SelectedBusAndTrackToXML.Save("SelectedBusAndTrack.xml");
+
+
+            ////Task 5
+            //Записать в соответствующие XML файлы следующую информацию:
+            // Полную информацию о всех транспортных средствах, сгруппированную по типу трансмиссии.
+
+            /*
+            var GroupedVehicles = from v in vehicles
+                                  group v by v.TransmissionType;
+
+            foreach (IGrouping<string, Vehicle> g in GroupedVehicles)
+            {
+                Console.WriteLine(g.Key);
+                foreach (var t in g)
+                    Console.WriteLine(t.Name);
+                Console.WriteLine();
+            }
+            */
+            
+    
+            var AllVehiclesToXML = new XElement("Root",
+                from v in vehicles
+                group v by v.TransmissionType,
+                select new XElement("Vehicle",
+                           new XElement("Name", v.Name),
+                           new XElement("EngineName", v.EngineName),
+                           new XElement("EngineVolume", v.EngineVolume),
+                           new XElement("EnginePower", v.EnginePower),
+                           new XElement("EngineType", v.EngineType),
+                           new XElement("EngineSerialNumber", v.EngineSerialNumber),
+                           new XElement("ChassisName", v.ChassisName),
+                           new XElement("ChassisNumberOfWheels", v.ChassisNumberOfWheels),
+                           new XElement("ChassisPermissibleLoad", v.ChassisPermissibleLoad),
+                           new XElement("ChassisPermissibleLoad", v.ChassisLicensePlate),
+                           new XElement("TransmissionName", v.TransmissionName),
+                           new XElement("TransmissionName", v.TransmissionType),
+                           new XElement("TransmissionName", v.TransmissionNumberOfGears),
+                           new XElement("TransmissionName", v.TransmissionManufacturer)
+                        )
+                    );
+
+
+
+            AllVehiclesToXML.Save("AllVehiclesToXML.xml");
+
             /*
             PassengerCar PassengerCar = new PassengerCar("Passenger car");
 

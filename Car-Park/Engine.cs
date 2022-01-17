@@ -10,7 +10,7 @@
         }
 
         public int power;
-        public int volume;
+        public double volume;
         public string type = "unknown";
         public string serialNumber = "unknown";
     }

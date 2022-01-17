@@ -9,7 +9,7 @@ namespace Car_Park
 
         public string EngineName { get; }
         public int EnginePower { get; }
-        public int EngineVolume { get; }
+        public double EngineVolume { get; }
         public string EngineType { get; }
         public string EngineSerialNumber { get; }
 
